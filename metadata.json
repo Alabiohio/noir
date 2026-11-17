@@ -1,0 +1,6 @@
+{
+  "name": "NOIR — Architecture & Spatial Design Studio",
+  "description": "Contemporary, minimalist, and brutalist 3D interactive architecture studio exhibition.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
