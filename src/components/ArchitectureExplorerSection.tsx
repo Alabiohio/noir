@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Layers, Moon, RotateCcw, Sun } from 'lucide-react';
 import {
   EXPLORER_CAMERA_PRESETS,
@@ -16,6 +16,29 @@ export function ArchitectureExplorerSection() {
   const [presetId, setPresetId] = useState<CameraPresetId>('perspective');
   const [exploded, setExploded] = useState(false);
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
+  const [isViewportVisible, setIsViewportVisible] = useState(false);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    if (!('IntersectionObserver' in window)) {
+      setHasEnteredViewport(true);
+      setIsViewportVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setHasEnteredViewport(true);
+        setIsViewportVisible(entry.isIntersecting);
+      },
+      { rootMargin: '300px', threshold: 0 }
+    );
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
 
   const activeMaterial =
     EXPLORER_MATERIALS.find((m) => m.id === materialId) || EXPLORER_MATERIALS[0];
@@ -51,13 +74,21 @@ export function ArchitectureExplorerSection() {
 
         {/* Interactive 3D Viewport Stage */}
         <ScrollReveal>
-          <div className="relative w-full h-[580px] md:h-[660px] lg:h-[720px] rounded-2xl border hairline-border bg-[#0b0c0e] overflow-hidden select-none">
-            <ExplorerBuildingScene
-              lightingMode={lightingMode}
-              materialId={materialId}
-              cameraPreset={activePreset}
-              exploded={exploded}
-            />
+          <div
+            ref={viewportRef}
+            className="relative w-full h-[580px] md:h-[660px] lg:h-[720px] rounded-2xl border hairline-border bg-[#0b0c0e] overflow-hidden select-none"
+          >
+            {hasEnteredViewport ? (
+              <ExplorerBuildingScene
+                lightingMode={lightingMode}
+                materialId={materialId}
+                cameraPreset={activePreset}
+                exploded={exploded}
+                active={isViewportVisible}
+              />
+            ) : (
+              <div aria-hidden="true" className="w-full h-full bg-[#0b0c0e]" />
+            )}
 
             {/* Minimal Top-Left Specification Readout (Non-obstructive) */}
             <div className="pointer-events-none absolute top-5 left-5 right-5 flex items-start justify-between gap-4">

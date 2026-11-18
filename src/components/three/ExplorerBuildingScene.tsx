@@ -21,6 +21,7 @@ interface ExplorerBuildingSceneProps {
   materialId: ArchitecturalMaterialId;
   cameraPreset: CameraPreset;
   exploded: boolean;
+  active: boolean;
 }
 
 const DAY_BG = new THREE.Color('#c8cdd3');
@@ -66,10 +67,11 @@ function ModernExplorerBuilding({
   materialId,
   cameraPreset,
   exploded,
+  active,
   isSoftwareGl,
   prefersReduced,
 }: ExplorerBuildingSceneProps & { isSoftwareGl: boolean; prefersReduced: boolean }) {
-  const { scene, camera } = useThree();
+  const { scene, camera, invalidate } = useThree();
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const presetTransitionActiveRef = useRef(true);
   const nightFactorRef = useRef(lightingMode === 'night' ? 1 : 0);
@@ -119,7 +121,16 @@ function ModernExplorerBuilding({
     presetTransitionActiveRef.current = true;
     _targetPos.set(...cameraPreset.position);
     _targetLook.set(...cameraPreset.target);
-  }, [cameraPreset]);
+    invalidate();
+  }, [cameraPreset, invalidate]);
+
+  useEffect(() => {
+    invalidate();
+  }, [lightingMode, exploded, invalidate]);
+
+  useEffect(() => {
+    invalidate();
+  }, [active, invalidate]);
 
   const activeMatConfig = useMemo(
     () => EXPLORER_MATERIALS.find((m) => m.id === materialId) || EXPLORER_MATERIALS[0],
@@ -239,6 +250,16 @@ function ModernExplorerBuilding({
           presetTransitionActiveRef.current = false;
         }
       }
+    }
+
+    const lightingInTransition = Math.abs(nf - targetNight) > 0.001;
+    const explosionInTransition = Math.abs(ef - targetExplode) > 0.001;
+    if (
+      lightingInTransition ||
+      explosionInTransition ||
+      presetTransitionActiveRef.current
+    ) {
+      invalidate();
     }
   });
 
@@ -525,6 +546,7 @@ export function ExplorerBuildingScene(props: ExplorerBuildingSceneProps) {
 
   return (
     <Canvas
+      frameloop={props.active ? 'demand' : 'never'}
       dpr={capability.maxDpr}
       shadows={!capability.isSoftwareGl}
       camera={{ position: props.cameraPreset.position, fov: 37, near: 0.2, far: 100 }}

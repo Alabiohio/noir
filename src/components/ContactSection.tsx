@@ -40,9 +40,6 @@ export function ContactSection({ inquiryInputRef }: ContactSectionProps) {
           {/* Left Editorial Invitation */}
           <div className="lg:col-span-6 flex flex-col justify-between space-y-10">
             <div>
-              <p className="text-xs font-mono tracking-[0.18em] text-accent uppercase mb-4">
-                04. Commissions &amp; Dialogue
-              </p>
               <SplitText
                 as="h2"
                 text="Initiate an architectural commission."
@@ -81,10 +78,10 @@ export function ContactSection({ inquiryInputRef }: ContactSectionProps) {
                   Direct
                 </p>
                 <a
-                  href="mailto:commissions@noir-studio.arch"
+                  href="mailto:info@oheo.site"
                   className="text-bone/85 hover:text-accent transition-colors font-light underline underline-offset-4 decoration-bone/25"
                 >
-                  commissions@noir-studio.arch
+                  info@oheo.site
                 </a>
               </div>
             </div>

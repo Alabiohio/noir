@@ -109,13 +109,6 @@ export function StudioSection() {
                     >
                       <div className="flex items-baseline gap-5">
                         <span
-                          className={`text-xs font-mono tabular-nums transition-colors ${
-                            isActive ? 'text-accent' : 'text-concrete'
-                          }`}
-                        >
-                          {service.index}.
-                        </span>
-                        <span
                           className={`text-xl md:text-2xl font-light tracking-tight transition-colors ${
                             isActive ? 'text-bone' : 'text-bone/60 group-hover:text-bone'
                           }`}
@@ -142,7 +135,7 @@ export function StudioSection() {
               className="p-6 md:p-8 rounded-2xl bg-obsidian border hairline-border space-y-4"
             >
               <div className="text-xs font-mono tracking-[0.14em] uppercase text-accent">
-                {activeService.index} · {activeService.discipline}
+                {activeService.discipline}
               </div>
               <p className="text-sm md:text-base font-light leading-relaxed text-bone/82">
                 {activeService.description}

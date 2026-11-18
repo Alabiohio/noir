@@ -16,7 +16,21 @@ export function HeroBrutalistScene() {
   const prefersReduced = useReducedMotion();
   const capability = useWebGLCapability();
   const pointerRef = useRef<PointerRef>({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
   const [contextLost, setContextLost] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const onPointerMove = (e: PointerEvent) => {
@@ -40,8 +54,11 @@ export function HeroBrutalistScene() {
   }
 
   return (
-    <div className="w-full h-full relative" aria-hidden="true">
+    <div ref={containerRef} className="w-full h-full relative" aria-hidden="true">
       <Canvas
+        frameloop={
+          !isVisible ? 'never' : prefersReduced ? 'demand' : 'always'
+        }
         dpr={capability.maxDpr}
         shadows={!capability.isSoftwareGl}
         camera={{
@@ -82,7 +99,7 @@ export function HeroBrutalistScene() {
           intensity={2.15}
           color="#eef3f8"
           castShadow={!capability.isSoftwareGl}
-          shadow-mapSize={capability.isMobile ? [1024, 1024] : [2048, 2048]}
+          shadow-mapSize={[1024, 1024]}
           shadow-camera-near={1}
           shadow-camera-far={55}
           shadow-camera-left={-14}
